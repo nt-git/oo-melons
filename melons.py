@@ -4,14 +4,14 @@
 class AbstractMelonOrder(object):
     """An abstract base class that other Melon Orders inherit from"""
 
-    def __init__(self, species, qty, country_code=None, passed_inspection=False):
+    def __init__(self, species, qty):
         """Initialize melon order attributes."""
         # creates the instance
         self.species = species
         self.qty = qty
         self.shipped = False
-        if country_code:
-            self.country_code = country_code
+        # if country_code:
+        #     self.country_code = country_code
         # if country code isn't none or false, will set country code attribute
         # ...as entered country code
 
@@ -46,15 +46,15 @@ class DomesticMelonOrder(AbstractMelonOrder):
 class InternationalMelonOrder(AbstractMelonOrder):
     """An international (non-US) melon order."""
 
+    tax = 0.17
+    order_type = "international"
+
     def __init__(self, species, qty, country_code):
 
         self.country_code = country_code
-        self.tax = 0.17
-        self.order_type = "international"
-        self.species = species # added species for part 2
-        self.qty = qty # added qty for part 2
-        # this has to be self because it's in the __init__
-        # ...and therefore is on the object, not the class
+        super(InternationalMelonOrder, self).__init__(species, qty)
+        # calling information on part AbstractMelon...
+        # MRO - instance > class > talk to classes' parent class... etc.
 
     def get_country_code(self):
         """Return the country code."""
@@ -75,23 +75,13 @@ class InternationalMelonOrder(AbstractMelonOrder):
 
 
 class GovernmentMelonOrder(AbstractMelonOrder):
-    """No tax for all gov't orders"""
+    """Class for handling government orders"""
 
+    tax = 0
+    passed_inspection = False
     # what is specific to this class?
-    def __init__(self, species, qty, country_code, passed_inspection):
 
-        self.passed_inspection = False
-        self.tax = 0
+    def mark_inspection_results(self, passed):
+        """Record the results of an order having been inspected."""
 
-    def mark_inspection(self):
-        """Record the fact than an order has been shipped."""
-
-        self.passed_inspection = True
-
-    def get_total(self):
-        """Not tax for gov't orders"""
-        subtotal = super(GovernmentMelonOrder, self).get_total()
-
-        total = self.qty * base_price
-
-        return total
+        self.passed_inspection = passed
